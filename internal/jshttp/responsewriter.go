@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"sync"
+	"syscall/js"
 )
 
 type ResponseWriterBuffer struct {
@@ -13,6 +14,7 @@ type ResponseWriterBuffer struct {
 	Writer      *io.PipeWriter
 	ReadyCh     chan struct{}
 	Once        sync.Once
+	WebSocket   js.Value
 }
 
 var _ http.ResponseWriter = &ResponseWriterBuffer{}
