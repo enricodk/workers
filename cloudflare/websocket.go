@@ -1,9 +1,15 @@
 package cloudflare
 
-import "syscall/js"
+import (
+	"net/http"
+	"syscall/js"
+
+	"github.com/syumai/workers/internal/jshttp"
+	"github.com/syumai/workers/internal/jsutil"
+)
 
 func NewWebSocketPair() (client *WebSocket, server *WebSocket) {
-	pair := js.Global().Get("WebSocketPair").New()
+	pair := jsutil.WebSocketPairClass.New()
 	client = &WebSocket{Instance: pair.Index(0)}
 	server = &WebSocket{Instance: pair.Index(1)}
 	return
@@ -23,6 +29,11 @@ func (w *WebSocket) Send(v any) {
 
 func (w *WebSocket) Close() {
 	w.Instance.Call("close")
+}
+
+func (w *WebSocket) SetResponseWebSocket(rw http.ResponseWriter) {
+	rwb := rw.(*jshttp.ResponseWriterBuffer)
+	rwb.WebSocket = w.Instance
 }
 
 func (w *WebSocket) AddCloseListener(handler func(*CloseEvent)) {

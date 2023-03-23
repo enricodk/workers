@@ -43,6 +43,10 @@ func ToJSResponse(w *ResponseWriterBuffer) (js.Value, error) {
 	respInit.Set("status", status)
 	respInit.Set("statusText", http.StatusText(status))
 	respInit.Set("headers", ToJSHeader(w.Header()))
+	respInit.Set("webSocket", w.WebSocket)
+	if status == 101 || status == 204 || status == 205 || status == 304 {
+		return jsutil.ResponseClass.New(respInit), nil
+	}
 	readableStream := jsutil.ConvertReaderToReadableStream(w.Reader)
 	return jsutil.ResponseClass.New(readableStream, respInit), nil
 }
